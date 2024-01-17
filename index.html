@@ -22,7 +22,7 @@
 
                     const hours = Math.floor(minutesAfterMidnight / 60);
                     const minutes = (minutesAfterMidnight % 60);
-                    console.log(minutesAfterMidnight + " % 60 = " + (minutesAfterMidnight % 60));
+                    // console.log(minutesAfterMidnight + " % 60 = " + (minutesAfterMidnight % 60));
 
                     // Determine AM or PM
                     const meridiem = hours < 12 ? "AM" : "PM";
@@ -66,11 +66,16 @@
             },
             step: 30
         });
+
+        const startTimeStr = document.getElementsByClassName("noUi-tooltip")[0].innerHTML;
+        const endTimeStr = document.getElementsByClassName("noUi-tooltip")[1].innerHTML;
+        console.log(startTimeStr, endTimeStr);
     </script>
 </head>
 
 <body>
     <h1>I am experimenting</h1>
+    <br>
     <div id="slider-tooltips" style="position: relative; left: auto; right: auto; width: 50%;"></div>
     <div id="input-format" style="position: relative; left: auto; right: auto;"></div>
 </body>
