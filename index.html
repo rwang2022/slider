@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href='./nouislider/dist/nouislider.css'>
+    <style>
+    </style>
+    <script type="module">
+        import noUiSlider from './nouislider/dist/nouislider.mjs';
+
+        var tooltipSlider = document.getElementById('slider-tooltips');
+
+        noUiSlider.create(tooltipSlider, {
+            start: [360, 1080],
+            tooltips:
+            {
+                to: function (minutesAfterMidnight) {
+                    minutesAfterMidnight = Math.round(minutesAfterMidnight);
+
+                    const hours = Math.floor(minutesAfterMidnight / 60);
+                    const minutes = (minutesAfterMidnight % 60);
+                    console.log(minutesAfterMidnight + " % 60 = " + (minutesAfterMidnight % 60));
+
+                    // Determine AM or PM
+                    const meridiem = hours < 12 ? "AM" : "PM";
+
+                    // Adjust hours for 12-hour format
+                    const formattedHours = hours % 12 || 12;
+
+                    // Format the time
+                    const timeString = `${String(formattedHours)}:${String(minutes).padStart(2, '0')}${meridiem}`;
+
+                    return timeString;
+                },
+                from: function (timeString) {
+                    timeStr = timeStr.trim();
+                    // Split the time string into hours, minutes, and AM/PM
+                    // var [time, meridiem] = timeStr.split(" ");
+                    var time = timeStr.slice(0, -2);
+                    var meridiem = timeStr.slice(-2, undefined);
+                    var [hoursStr, minutesStr] = time.split(":");
+
+                    // Convert hours and minutes to numbers
+                    let hours = parseInt(hoursStr, 10);
+                    let minutes = parseInt(minutesStr, 10);
+
+                    // Adjust hours for 24-hour format
+                    if (meridiem === "PM" && hours !== 12) {
+                        hours += 12;
+                    } else if (meridiem === "AM" && hours === 12) {
+                        hours = 0;
+                    }
+
+                    // Calculate total minutes after midnight
+                    var minutesAfterMidnight = hours * 60 + minutes;
+
+                    return minutesAfterMidnight;
+                }   
+            },
+            range: {
+                'min': 0,
+                'max': 1439
+            },
+            step: 30
+        });
+    </script>
+</head>
+
+<body>
+    <h1>I am experimenting</h1>
+    <div id="slider-tooltips" style="position: relative; left: auto; right: auto; width: 50%;"></div>
+    <div id="input-format" style="position: relative; left: auto; right: auto;"></div>
+</body>
+
+</html>
