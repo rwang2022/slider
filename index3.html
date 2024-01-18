@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href='./nouislider/dist/nouislider.css'>
+    <script type="module">
+        import noUiSlider from './nouislider/dist/nouislider.mjs';
+        var lockedState = true;
+        var lockedSlider = true;
+        var lockedValues = [8 * 60, 10 * 60]; // 8AM, 10AM
+        var slider1 = document.getElementById('slider1');
+        var slider2 = document.getElementById('slider2');
+        var lockButton = document.getElementById('lockbutton');
+        var slider1Value = document.getElementById('slider1-span');
+        var slider2Value = document.getElementById('slider2-span');
+        var format = {
+            to: function (minutesAfterMidnight) {
+                minutesAfterMidnight = Math.round(minutesAfterMidnight);
+                const hours = Math.floor(minutesAfterMidnight / 60);
+                const minutes = (minutesAfterMidnight % 60);
+                const meridiem = hours < 12 ? "AM" : "PM";
+                const formattedHours = hours % 12 || 12;
+                const timeString = `${String(formattedHours)}:${String(minutes).padStart(2, '0')}${meridiem}`;
+                return timeString;
+            },
+            from: function (timeString) {
+                timeStr = timeStr.trim();
+                var time = timeStr.slice(0, -2);
+                var meridiem = timeStr.slice(-2, undefined);
+                var [hoursStr, minutesStr] = time.split(":");
+                let hours = parseInt(hoursStr, 10);
+                let minutes = parseInt(minutesStr, 10);
+                if (meridiem === "PM" && hours !== 12) {
+                    hours += 12;
+                } else if (meridiem === "AM" && hours === 12) {
+                    hours = 0;
+                }
+                var minutesAfterMidnight = hours * 60 + minutes;
+                return minutesAfterMidnight;
+            }
+        }
+        lockButton.addEventListener('click', function () {
+            lockedState = !lockedState;
+            this.textContent = lockedState ? 'Unlock' : 'Lock';
+        });
+        function crossUpdate(value, slider) {
+            if (!lockedState) return;
+            var a = slider1 === slider ? 0 : 1;
+            var b = a ? 0 : 1;
+            value -= lockedValues[b] - lockedValues[a];
+            slider.noUiSlider.set(value);
+        }
+        const START_OF_DAY = 0;
+        const LAST_MINUTE = 23 * 60 + 59;
+        noUiSlider.create(slider1, {
+            start: 8 * 60,
+            animate: false,
+            range: {
+                min: START_OF_DAY,
+                max: LAST_MINUTE
+            }
+        });
+        noUiSlider.create(slider2, {
+            start: 10 * 60,
+            animate: false,
+            range: {
+                min: START_OF_DAY,
+                max: LAST_MINUTE
+            }
+        });
+        slider1.noUiSlider.on('update', function (values, handle) {
+            slider1Value.innerHTML = format.to(values[handle]);
+        });
+        slider2.noUiSlider.on('update', function (values, handle) {
+            slider2Value.innerHTML = format.to(values[handle]);
+        });
+        function setLockedValues() {
+            lockedValues = [
+                Number(slider1.noUiSlider.get()),
+                Number(slider2.noUiSlider.get())
+            ];
+        }
+        slider1.noUiSlider.on('change', setLockedValues);
+        slider2.noUiSlider.on('change', setLockedValues);
+        slider1.noUiSlider.on('slide', function (values, handle) {
+            crossUpdate(values[handle], slider2);
+        });
+        slider2.noUiSlider.on('slide', function (values, handle) {
+            crossUpdate(values[handle], slider1);
+        });
+    </script>
+</head>
+
+<body>
+    <div id="slider1"></div>
+    <div id="slider1-span"></div>
+    <div id="slider2"></div>
+    <div id="slider2-span"></div>
+    <div id="slider2-span"></div>
+    <button id="lockbutton">Unlock</button>
+</body>
+
+</html>
